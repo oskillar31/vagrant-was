@@ -1,0 +1,14 @@
+create
+profileName=dmgr
+profilePath=/ssw/was8tst01/was/profiles/dmgr
+templatePath=/ssw/was8tst01/profileTemplates/management
+nodeName=masternd
+cellName=was8tst01
+hostName=master
+adminUserName=wasadmin
+adminPassword=wasadmin
+enableAdminSecurity=true
+isDefault=true
+serverType=DEPLOYMENT_MANAGER
+defaultPorts=enabled
+validatePorts=enabled

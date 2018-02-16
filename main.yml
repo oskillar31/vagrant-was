@@ -1,0 +1,139 @@
+---
+- hosts: master
+  gather_facts: True
+  become: True
+  
+  vars:
+    - iim_tmp_folder: '/tmp/IIM'
+    - iim_package_zip_name: 'NDTRIAL.agent.installer.linux.gtk.x86_64.zip'
+    - iim_response_file: '/vagrant/files/my_responseFile.xml'
+    - iim_secure_storage_file: '/vagrant/files/credential_store.txt'
+    - iim_userinstc_args: '-acceptLicense -s -secureStorageFile {{ iim_secure_storage_file }} -input {{ iim_response_file }} -nosplash -ShowVerboseProgress'
+    - was_basefolder: '/ssw'
+    - was_cell_name: 'was8tst01'
+    - was_cell_path: '{{ was_basefolder }}/{{ was_cell_name }}'
+    - was_cell_bin: '{{ was_basefolder }}/{{ was_cell_name }}/bin'
+    - was_dmgr_name: 'dmgr'
+    - was_node_name: 'node1'
+    - was_profiles_path: '{{ was_cell_path }}/was/profiles'
+    - was_dmgr_bin: '{{ was_profiles_path }}/{{ was_dmgr_name }}/bin'
+    - was_node_bin: '{{ was_profiles_path }}/{{ was_node_name }}/bin'
+    - was_deploy_ear_script: '/vagrant/files/deploy_pbw.py'
+
+  tasks:
+    - name: 'Update APT repositories'
+      apt:
+        update_cache: 'yes'
+        cache_valid_time: '3600'
+
+    - name: 'Install git'
+      apt:
+        name: 'git'
+        state: 'present'
+
+    - name: 'Install unzip'
+      apt:
+        name: 'unzip'
+        state: 'present'
+
+    - name: 'Get manageprofilesInteractive tool package from URL'
+      get_url:
+        url: 'https://drive.google.com/uc?export=download&confirm=hTQz&id=1H6D7Rkel9oPvuP10EI96h-yEtn0WZWg0'
+        dest: '/tmp'
+        mode: '0740'
+        owner: 'vagrant'
+        group: 'vagrant'
+
+    - name: 'Create a temporary folder {{ iim_tmp_folder }}'
+      file:
+        path: '{{ iim_tmp_folder }}'
+        state: 'directory'
+        owner: 'vagrant'
+        group: 'vagrant'
+        mode: '0755'
+
+    - name: 'Create installation folder {{ was_basefolder }}/{{ was_cell_name }}'
+      file:
+        path: '{{ was_cell_path }}'
+        state: 'directory'
+        owner: 'vagrant'
+        group: 'vagrant'
+        mode: '0755'
+
+    - name: 'Unzip IIM & WebSphere binaries to {{ iim_tmp_folder }}'
+      unarchive:
+        src: '/vagrant/files/{{ iim_package_zip_name }}'
+        dest: '{{ iim_tmp_folder }}'
+        remote_src: 'yes'
+        owner: 'vagrant'
+        group: 'vagrant'
+        creates: '{{ iim_tmp_folder }}/userinstc'
+       
+    - name: 'Install binaries of IBM Installation Manager & WebSphere Application Server'
+      shell: './userinstc {{ iim_userinstc_args }}'
+      args:
+        chdir: '{{ iim_tmp_folder }}'
+        creates: '{{ was_cell_bin }}/wsadmin.sh'
+      become_user: 'vagrant'
+      
+    - name: 'Unzip manageprofilesInteractive tool to {{ was_cell_bin }}'
+      unarchive:
+        src: '/tmp/manageprofilesInteractive.zip'
+        dest: '{{ was_cell_bin }}'
+        remote_src: 'yes'
+        owner: 'vagrant'
+        group: 'vagrant'
+        creates: '{{ was_cell_bin }}/manageprofilesInteractive.jar'
+        
+    - name: 'Grant execution permissionos to manageprofilesInteractive tool scripts'
+      file:
+        path: '{{ was_cell_bin }}/run_manageprofilesInteractive.sh'
+        mode: '0740'
+
+    - name: 'Run manageprofiles.sh to create "{{ was_dmgr_name }}" profile'
+      shell: './manageprofiles.sh -response /vagrant/files/reponsefile_dmgr.txt'
+      args:
+        chdir: '{{ was_cell_bin }}'
+        creates: '{{ was_dmgr_bin }}/startManager.sh'
+      become_user: 'vagrant'
+
+    - name: 'Run manageprofiles.sh to create "{{ was_node_name }}" profile'
+      shell: './manageprofiles.sh -response /vagrant/files/reponsefile_node1.txt'
+      args:
+        chdir: '{{ was_cell_bin }}'
+        creates: '{{ was_node_bin }}/addNode.sh'
+      become_user: 'vagrant'
+
+    - name: 'Start Deployment Manager'
+      shell: './startManager.sh'
+      args:
+        chdir: '{{ was_dmgr_bin }}'
+      become_user: 'vagrant'
+
+    - name: 'Federate "{{ was_node_name }}" to cell "{{ was_cell_name }}"'
+      shell: './addNode.sh master 8879 -username wasadmin -password wasadmin'
+      args:
+        chdir: '{{ was_node_bin }}'
+      become_user: 'vagrant'
+
+    - name: 'Install example App: Deploy derby database'
+      unarchive:
+        src: '/vagrant/files/pbw-db.jar'
+        dest: '{{ was_cell_path }}/derby/databases'
+        remote_src: 'yes'
+        owner: 'vagrant'
+        group: 'vagrant'
+        creates: '{{ was_cell_path }}/derby/databases/PLANTSDB'
+
+    - name: 'Install example App: Deploy EAR application'
+      shell: './wsadmin.sh -lang jython -username wasadmin -password wasadmin -f {{ was_deploy_ear_script }}'
+      args:
+        chdir: '{{ was_dmgr_bin }}'
+        creates: '{{ was_profiles_path }}/{{ was_node_name }}/installedApps/{{ was_cell_name }}/PlantsByWebSphere.ear'
+      become_user: 'vagrant'
+
+    - name: 'Start Application Server'
+      shell: './startServer.sh test_d01a'
+      args:
+        chdir: '{{ was_node_bin }}'
+      become_user: 'vagrant'

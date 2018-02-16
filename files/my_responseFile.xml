@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<agent-input>
+  <variables>
+    <variable name='sharedLocation' value='/ssw/IMShared'/>
+  </variables>
+  <server>
+    <repository location='/tmp/IIM'/>
+    <repository location='http://www.ibm.com/software/repositorymanager/V85WASNDTrial'/>
+  </server>
+  <profile id='IBM Installation Manager' installLocation='/ssw/iim/eclipse' kind='self'>
+    <data key='eclipseLocation' value='/ssw/iim/eclipse'/>
+    <data key='user.import.profile' value='false'/>
+    <data key='cic.selector.os' value='linux'/>
+    <data key='cic.selector.arch' value='x86_64'/>
+    <data key='cic.selector.ws' value='gtk'/>
+  </profile>
+  <install modify='false'>
+    <!-- IBM® Installation Manager 1.8.1 -->
+    <offering profile='IBM Installation Manager' id='com.ibm.cic.agent' version='1.8.1000.20141126_2002' features='agent_core,agent_jre,agent_web' installFixes='none'/>
+  </install>
+  <profile id='IBM WebSphere Application Server V8.5' installLocation='/ssw/was8tst01'>
+    <data key='eclipseLocation' value='/ssw/was8tst01'/>
+    <data key='user.import.profile' value='false'/>
+    <data key='cic.selector.os' value='linux'/>
+    <data key='cic.selector.arch' value='x86'/>
+    <data key='cic.selector.ws' value='gtk'/>
+    <data key='cic.selector.nl' value='en'/>
+    <data key='user.wasjava' value='java8'/>
+    <data key='user.internal.use.only.prev.wasjava' value='java8'/>
+  </profile>
+  <install modify='false'>
+    <!-- 8.5.5.12-WS-WASProd-IFPI85892 -->
+    <offering profile='IBM WebSphere Application Server V8.5' id='8.5.5.12-WS-WASProd-IFPI85892'/>
+    <!-- 8.5.5.2-WS-WAS-IFPI87299 -->
+    <offering profile='IBM WebSphere Application Server V8.5' id='8.5.5.2-WS-WAS-IFPI87299'/>
+    <!-- 8.5.5.3-WS-WASProd-IFPI82308 -->
+    <offering profile='IBM WebSphere Application Server V8.5' id='8.5.5.3-WS-WASProd-IFPI82308'/>
+    <!-- 8.5.5.4-WS-WAS-IFPI87300 -->
+    <offering profile='IBM WebSphere Application Server V8.5' id='8.5.5.4-WS-WAS-IFPI87300'/>
+    <!-- IBM WebSphere Application Server Network Deployment Trial 8.5.5.12 -->
+    <offering profile='IBM WebSphere Application Server V8.5' id='com.ibm.websphere.NDTRIAL.v85' version='8.5.5012.20170627_1018' features='core.feature,ejbdeploy,thinclient,embeddablecontainer,com.ibm.sdk.6_64bit,samples' installFixes='none'/>
+  </install>
+  <preference name='com.ibm.cic.common.core.preferences.eclipseCache' value='${sharedLocation}'/>
+  <preference name='com.ibm.cic.common.core.preferences.connectTimeout' value='30'/>
+  <preference name='com.ibm.cic.common.core.preferences.readTimeout' value='45'/>
+  <preference name='com.ibm.cic.common.core.preferences.downloadAutoRetryCount' value='0'/>
+  <preference name='offering.service.repositories.areUsed' value='true'/>
+  <preference name='com.ibm.cic.common.core.preferences.ssl.nonsecureMode' value='false'/>
+  <preference name='com.ibm.cic.common.core.preferences.http.disablePreemptiveAuthentication' value='false'/>
+  <preference name='http.ntlm.auth.kind' value='NTLM'/>
+  <preference name='http.ntlm.auth.enableIntegrated.win32' value='true'/>
+  <preference name='com.ibm.cic.common.core.preferences.preserveDownloadedArtifacts' value='true'/>
+  <preference name='com.ibm.cic.common.core.preferences.keepFetchedFiles' value='false'/>
+  <preference name='PassportAdvantageIsEnabled' value='false'/>
+  <preference name='com.ibm.cic.common.core.preferences.searchForUpdates' value='false'/>
+  <preference name='com.ibm.cic.agent.ui.displayInternalVersion' value='false'/>
+  <preference name='com.ibm.cic.common.sharedUI.showErrorLog' value='true'/>
+  <preference name='com.ibm.cic.common.sharedUI.showWarningLog' value='true'/>
+  <preference name='com.ibm.cic.common.sharedUI.showNoteLog' value='true'/>
+</agent-input>

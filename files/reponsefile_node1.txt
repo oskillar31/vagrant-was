@@ -1,0 +1,13 @@
+create
+profileName=node1
+profilePath=/ssw/was8tst01/was/profiles/node1
+templatePath=/ssw/was8tst01/profileTemplates/default
+nodeName=mastern1
+cellName=mycell
+hostName=master
+serverName=test_d01a
+adminUserName=wasadmin
+adminPassword=wasadmin
+enableAdminSecurity=true
+omitAction=samplesInstallandConfig
+validatePorts=enabled
