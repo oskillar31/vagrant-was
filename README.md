@@ -22,7 +22,7 @@ WebSphere Application server instance will contain a cell formed by:
 1. Clone this repository
 
     ```bash
-    $ git clone git@github.dxc.com:mmenendezvaz/vagrant-websphere.git
+    $ git clone https://github.com/marcemv/vagrant-was.git
     ```
 
 2. Download [NDTRIAL.agent.installer.linux.gtk.x86_64.zip](https://drive.google.com/uc?export=download&id=0B-Az43g0UG4hRl84dnFSOGxIbDA) and place it into `files` directory.
